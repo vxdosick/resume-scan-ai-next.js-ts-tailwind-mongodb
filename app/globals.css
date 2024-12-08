@@ -36,4 +36,7 @@
 .main--marginbottom {
     margin-bottom: 40px;
 }
-
+.small--text {
+    font-size: 18px;
+    font-weight: 400;
+}

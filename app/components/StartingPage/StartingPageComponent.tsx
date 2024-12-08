@@ -13,6 +13,16 @@ const StartingPageComponent = () => {
           <nav className="header__menu">
             <ul className="flex items-center gap-8">
               <li>
+                <Link className="text--normal" href="#about">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link className="text--normal" href="#review">
+                  Review
+                </Link>
+              </li>
+              <li>
                 <Link className="text--normal py-2 px-5 bg-blue-300 
                 text-white rounded-lg" href="/login">
                   Login
@@ -87,6 +97,12 @@ const StartingPageComponent = () => {
               <h2 className='title--text'>About Us</h2>
               <p className='text--normal'>ResumeScanAi is a cutting-edge platform that leverages AI technology to help individuals validate and enhance their resumes. Our service is designed to offer tailored feedback based on the type of company you&apos;re targeting, ensuring your resume meets industry standards. Whether you&apos;re an employer, HR specialist, or job seeker in IT or any other sector, our AI-enabled resume verification provides detailed insights to help you stand out. With ResumeScanAi, you can receive both general and specific recommendations that will elevate your resume to the next level.</p>
             </div>
+          </div>
+        </section>
+        <section className="main--marginbottom review" id="review">
+          <div className="review__container main__container">
+            <h2 className="subtitle--text text-center mb-9">Reviews</h2>
+            <h3 className="text--normal">Soon....</h3>
           </div>
         </section>
       </main>

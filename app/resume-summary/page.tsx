@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export interface Feedback {
   rating: number;
@@ -12,69 +13,88 @@ export interface Feedback {
 }
 
 const ResumeSummary = () => {
+  const router = useRouter();
+
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [saving, setSaving] = useState(false); // Состояние сохранения
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null); // Сообщение об успехе или ошибке
 
+  const [username, setUsername] = useState<string | null>(null); // Для отображения ссылки на профиль
+
   useEffect(() => {
-    const data = localStorage.getItem('resumeFeedback');
+    const data = localStorage.getItem("resumeFeedback");
     if (data) {
       const parsedData = JSON.parse(data);
-      const textResponse = parsedData?.geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const textResponse =
+        parsedData?.geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (textResponse) {
         try {
-          setFeedback(JSON.parse(textResponse.replace('```json', '').replace('```', '').trim()));
+          setFeedback(
+            JSON.parse(
+              textResponse.replace("```json", "").replace("```", "").trim()
+            )
+          );
         } catch (error) {
-          console.error('Error parsing feedback:', error);
+          console.error("Error parsing feedback:", error);
         }
       }
     }
+
+    // Установка username из localStorage
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
   }, []);
-  
 
   const handleSaveFeedback = async () => {
     setSaving(true);
     setSaveSuccess(null);
-  
-    const userId = localStorage.getItem('userId'); // Проверяем наличие userId
-    const username = localStorage.getItem('username'); // Получаем username из localStorage
-  
+
+    const userId = localStorage.getItem("userId"); // Проверяем наличие userId
+
     if (!userId || !username || !feedback) {
-      setSaveSuccess('Failed to save feedback: User not logged in or no feedback available');
+      setSaveSuccess(
+        "Failed to save feedback: User not logged in or no feedback available"
+      );
       setSaving(false);
       return;
     }
-  
+
     try {
-      const response = await fetch('/api/save-feedback', {
-        method: 'POST',
+      const response = await fetch("/api/save-feedback", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username,
           ...feedback, // Передаём весь объект `feedback`
         }),
       });
-  
+
       if (response.ok) {
-        setSaveSuccess('Feedback saved successfully');
+        setSaveSuccess("Feedback saved successfully");
       } else {
         const data = await response.json();
         setSaveSuccess(`Failed to save feedback: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error saving feedback:', error);
-      setSaveSuccess('Failed to save feedback: Internal server error');
+      console.error("Error saving feedback:", error);
+      setSaveSuccess("Failed to save feedback: Internal server error");
     } finally {
       setSaving(false);
     }
   };
-  
 
   if (!feedback) {
     return <p>Loading feedback...</p>;
   }
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    router.push("/login");
+  };
 
   return (
     <>
@@ -90,6 +110,30 @@ const ResumeSummary = () => {
                   Home
                 </Link>
               </li>
+              {username ? (
+                <li>
+                  <Link
+                    className="text--normal flex items-center gap-2"
+                    href={`/profile/${username}`}
+                  >
+                    <Image
+                      src="/images/avatar.svg"
+                      width={25}
+                      height={25}
+                      alt="avatar"
+                    ></Image>
+                    {username}
+                  </Link>
+                </li>
+              ) : null}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text--normal py-1 px-4 bg-red-400 text-white rounded-lg"
+                >
+                  Logout
+                </button>
+              </li>
             </ul>
           </nav>
         </div>
@@ -102,7 +146,7 @@ const ResumeSummary = () => {
             <button
               onClick={handleSaveFeedback}
               disabled={saving}
-              className="mt-4 p-2 bg-green-500 text-white rounded"
+              className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white rounded-lg"
             >
               {saving ? "Saving..." : "Save Feedback"}
             </button>
