@@ -345,9 +345,18 @@ const DashboardContent = () => {
         </section>
       </main>
       <footer className="footer py-6">
-        <div className="footer__container text-center flex flex-col gap-1">
-          <Link href="/resume-summary" className="logo--smalltext">ResumeScanAi</Link>
-          <Link href="/resume-summary" className="link--normal">Privacy Policy</Link>
+        <div className="footer__container flex flex-col gap-1 main__container">
+          <div className="flex items-center justify-between mb-9">
+            <div className="flex items-center gap-2">
+                <Image width={30} height={30} src="/images/coffe.png" alt="image"></Image>
+                <Link href="buymeacoffee.com/vxdosick" className="small--text">
+                Support the project: buymeacoffee.com/vxdosick
+                </Link>
+            </div>
+            <Link href="/resume-summary" className="link--normal">Privacy Policy</Link>
+          </div>
+          <Link href="/resume-summary" className="logo--smalltext 
+          text-center">ResumeScanAi</Link>
         </div>
       </footer>
     </>
