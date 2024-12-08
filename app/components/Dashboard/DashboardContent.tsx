@@ -165,26 +165,24 @@ const DashboardContent = () => {
                   About
                 </Link>
               </li>
-              <li>
-                <Link className="text--normal" href="#review">
-                  Review
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="mt-4 p-2 bg-red-500 text-white rounded mx-auto block"
-                >
-                  Logout
-                </button>
-              </li>
               {username ? (
                 <li>
-                  <Link className="text--normal" href={`/profile/${username}`}>
+                  <Link className="text--normal flex items-center gap-2" 
+                  href={`/profile/${username}`}>
+                  <Image 
+                  src="images/avatar.svg" width={25} height={25} alt="avatar"></Image>
                     {username}
                   </Link>
                 </li>
               ) : null}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text--normal py-1 px-4 bg-red-400 text-white rounded-lg"
+                >
+                  Logout
+                </button>
+              </li>
             </ul>
           </nav>
         </div>
@@ -200,7 +198,7 @@ const DashboardContent = () => {
         </section>
         <section className="about main--marginbottom" id="about">
           <div className="about__container main__container">
-            <ul className="about__list flex gap-[100px] items-center mx-auto">
+            <ul className="about__list flex gap-[30px] items-start mx-auto">
               <li className="flex gap-4 items-start text--normal">
                 <Image width={30} height={30} src="/images/info.svg" alt="image" />
                 <p>
@@ -224,7 +222,7 @@ const DashboardContent = () => {
         </section>
         <section className="scan main--marginbottom" id="scan">
           <div className="scan__container main__container">
-            <h2 className="subtitle--text mb-2 text-center">Scan resume</h2>
+            <h2 className="subtitle--text mb-9 text-center">Scan resume</h2>
             <div className='scan__questions flex main--marginbottom mx-auto 
              gap-[300px] items-center'>
               <div
@@ -238,8 +236,10 @@ const DashboardContent = () => {
                 <Image width={100} height={100} src="/images/pdf-icon.svg" 
                 alt="Decorative image" />
                 <span className="mt-2 text-sm text-gray-500">{fileName}</span>
-                <label htmlFor="file" className="mt-2 px-4 py-2 bg-blue-500 text-white 
-                text-sm rounded-lg cursor-pointer hover:bg-blue-600 text--normal">
+                <label htmlFor="file" 
+                onClick={(e) => e.stopPropagation()} 
+                className="mt-2 px-5 py-2 bg-blue-300 text-white 
+                text-sm rounded-lg cursor-pointer text--normal">
                   Upload
                 </label>
                 <input
@@ -251,43 +251,74 @@ const DashboardContent = () => {
                 />
               </div>
               <div className="mb-4 flex flex-col gap-3">
-                <label className='text--normal'>
-                  <input
-                    type="radio"
-                    name="companyType"
-                    value="startup"
-                    onChange={handleTypeChange}
-                    className='mr-2'
-                  />
-                  Startup
-                </label>
-                <label className='text--normal'>
-                  <input
-                    type="radio"
-                    name="companyType"
-                    value="corporate"
-                    onChange={handleTypeChange}
-                    className='mr-2'
-                  />
-                  Corporate
-                </label>
-                <label className='text--normal'>
-                  <input
-                    type="radio"
-                    name="companyType"
-                    value="freelance"
-                    onChange={handleTypeChange}
-                    className='mr-2'
-                  />
-                  Freelance
-                </label>
+              <label className="text--normal">
+  <input
+    type="radio"
+    name="companyType"
+    value="startup"
+    onChange={handleTypeChange}
+    className="mr-2 appearance-none h-5 w-5 border-2 border-blue-300 rounded-[5px] bg-white checked:bg-blue-300 checked:border-blue-400 focus:outline-none"
+  />
+  Startup
+</label>
+
+<label className="text--normal">
+  <input
+    type="radio"
+    name="companyType"
+    value="startup"
+    onChange={handleTypeChange}
+    className="mr-2 appearance-none h-5 w-5 border-2 border-blue-300 rounded-[5px] bg-white checked:bg-blue-300 checked:border-blue-400 focus:outline-none"
+  />
+  Corporate
+</label>
+<label className="text--normal">
+  <input
+    type="radio"
+    name="companyType"
+    value="startup"
+    onChange={handleTypeChange}
+    className="mr-2 appearance-none h-5 w-5 border-2 border-blue-300 rounded-[5px] bg-white checked:bg-blue-300 checked:border-blue-400 focus:outline-none"
+  />
+  Freelance
+</label>
+<label className="text--normal">
+  <input
+    type="radio"
+    name="companyType"
+    value="startup"
+    onChange={handleTypeChange}
+    className="mr-2 appearance-none h-5 w-5 border-2 border-blue-300 rounded-[5px] bg-white checked:bg-blue-300 checked:border-blue-400 focus:outline-none"
+  />
+  Outsourcing
+</label>
+<label className="text--normal">
+  <input
+    type="radio"
+    name="companyType"
+    value="startup"
+    onChange={handleTypeChange}
+    className="mr-2 appearance-none h-5 w-5 border-2 border-blue-300 rounded-[5px] bg-white checked:bg-blue-300 checked:border-blue-400 focus:outline-none"
+  />
+  Product
+</label>
+<label className="text--normal">
+  <input
+    type="radio"
+    name="companyType"
+    value="startup"
+    onChange={handleTypeChange}
+    className="mr-2 appearance-none h-5 w-5 border-2 border-blue-300 rounded-[5px] bg-white checked:bg-blue-300 checked:border-blue-400 focus:outline-none"
+  />
+  Industrial
+</label>
               </div>
             </div>
             <div className='flex justify-center'>
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="py-2 px-10 bg-blue-500 text-white rounded text--normal">
+                className="py-2 px-5 bg-blue-300 text-white rounded-lg text--normal">
                 {loading ? 'Processing...' : 'Analyze'}
               </button>
             </div>
