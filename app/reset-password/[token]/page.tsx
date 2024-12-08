@@ -60,7 +60,8 @@ const ResetPasswordToken = ({ params }: { params: { token: string } }) => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="block mb-4 p-2 border rounded"
           />
-          <button type="submit" className="p-2 bg-blue-500 text-white rounded">
+          <button type="submit" className="py-2 w-full text--normal bg-blue-300 
+            text-white rounded-lg">
             Reset Password
           </button>
         </form>

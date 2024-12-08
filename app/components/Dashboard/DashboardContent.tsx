@@ -193,8 +193,10 @@ const DashboardContent = () => {
         </div>
       </header>
       <main className="main">
-        <section className="hero main--marginbottom text-white">
-          <div className="hero__container text-center bg-blue-300 py-[150px]">
+        <section className="hero main--marginbottom bg-blue-300 text-white">
+          <div className="hero__container text-center py-[150px] relative">
+            <Image width={100} height={100} src="/images/bg.png" alt="background"
+            className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"></Image>
             <h1 className="title--text mb-2">Resume validity checker</h1>
             <h2 className="text--normal">
               AI-enabled resume verification is the future for employers, hr employees, and all other IT specialties
@@ -353,9 +355,9 @@ const DashboardContent = () => {
                 Support the project: buymeacoffee.com/vxdosick
                 </Link>
             </div>
-            <Link href="/resume-summary" className="link--normal">Privacy Policy</Link>
+            <Link href="/" className="link--normal">Privacy Policy</Link>
           </div>
-          <Link href="/resume-summary" className="logo--smalltext 
+          <Link href="/dashboard" className="logo--smalltext 
           text-center">ResumeScanAi</Link>
         </div>
       </footer>

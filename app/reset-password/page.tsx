@@ -46,9 +46,10 @@ const ResetPassword = () => {
             className="block mb-4 p-2 border rounded"
           />
           <div>
-            <Link href="/login">Login</Link>
+            <Link href="/login" className='flex mb-2 text-blue-500'>Login</Link>
           </div>
-          <button type="submit" className="p-2 bg-blue-500 text-white rounded">
+          <button type="submit" className="py-2 w-full text--normal bg-blue-300 
+            text-white rounded-lg">
             Send Reset Link
           </button>
         </form>

@@ -115,9 +115,9 @@ const StartingPageComponent = () => {
                 Support the project: buymeacoffee.com/vxdosick
                 </Link>
             </div>
-            <Link href="/resume-summary" className="link--normal">Privacy Policy</Link>
+            <Link href="/" className="link--normal">Privacy Policy</Link>
           </div>
-          <Link href="/resume-summary" className="logo--smalltext 
+          <Link href="/" className="logo--smalltext 
           text-center">ResumeScanAi</Link>
         </div>
       </footer>

@@ -68,3 +68,27 @@ export async function GET(req: Request) {
     }
   }
   
+
+  export async function DELETE(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+  
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+  
+    try {
+      await connectToDatabase();
+  
+      const result = await Feedback.findByIdAndDelete(id);
+  
+      if (!result) {
+        return NextResponse.json({ error: 'Feedback not found' }, { status: 404 });
+      }
+  
+      return NextResponse.json({ message: 'Feedback deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      return NextResponse.json({ error: 'Failed to delete feedback' }, { status: 500 });
+    }
+  }

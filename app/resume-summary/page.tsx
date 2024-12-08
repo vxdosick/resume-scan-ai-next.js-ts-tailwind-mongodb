@@ -146,11 +146,12 @@ const ResumeSummary = () => {
             <button
               onClick={handleSaveFeedback}
               disabled={saving}
-              className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white rounded-lg"
+              className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white 
+              rounded-lg"
             >
               {saving ? "Saving..." : "Save Feedback"}
             </button>
-            {saveSuccess && <p className="mt-2">{saveSuccess}</p>}
+            {saveSuccess && <p className="mt-4 text--normal">{saveSuccess}</p>}
           </div>
         </section>
         <section className="strengths main--marginbottom">
@@ -159,7 +160,7 @@ const ResumeSummary = () => {
             <ul className="mb-6 flex flex-col gap-[20px]">
               {feedback.strengths && feedback.strengths.length > 0 ? (
                 feedback.strengths.map((strength, index) => (
-                  <li key={index} className="text--normal flex items-center gap-3">
+                  <li key={index} className="text--normal flex items-start gap-3">
                     <Image
                       width={40}
                       height={40}
@@ -181,7 +182,7 @@ const ResumeSummary = () => {
             <ul className="mb-6 flex flex-col gap-[20px]">
               {feedback.weaknesses && feedback.weaknesses.length > 0 ? (
                 feedback.weaknesses.map((weakness, index) => (
-                  <li key={index} className="text--normal flex items-center gap-3">
+                  <li key={index} className="text--normal flex items-start gap-3">
                     <Image
                       width={40}
                       height={40}
@@ -213,7 +214,7 @@ const ResumeSummary = () => {
                 Support the project: buymeacoffee.com/vxdosick
                 </Link>
             </div>
-            <Link href="/resume-summary" className="link--normal">Privacy Policy</Link>
+            <Link href="/" className="link--normal">Privacy Policy</Link>
           </div>
           <Link href="/resume-summary" className="logo--smalltext 
           text-center">ResumeScanAi</Link>

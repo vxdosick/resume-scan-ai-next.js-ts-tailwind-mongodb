@@ -51,16 +51,16 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="block mb-4 p-2 border rounded"
           />
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-2">
             <Link href="/reset-password">
               <p className="text-blue-500">Forgot Password</p>
             </Link>
-
             <Link href="/register">
               <p className="text-blue-500">Register</p>
             </Link>
           </div>
-          <button type="submit" className="p-2 w-full bg-blue-500 text-white rounded">
+          <button type="submit" className="py-2 w-full text--normal bg-blue-300 
+            text-white rounded-lg">
             Login
           </button>
         </form>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 interface Feedback {
+  _id: string; // Добавлено поле для идентификатора отзыва
   rating: number;
   strengths: string[];
   weaknesses: string[];
@@ -56,6 +57,24 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
 
     fetchFeedbacks();
   }, [username]);
+
+  const handleDeleteFeedback = async (id: string) => {
+    try {
+      const response = await fetch(`/api/save-feedback?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete feedback');
+      }
+
+      // Удаление отзыва из состояния
+      setFeedbacks((prevFeedbacks) => prevFeedbacks.filter((feedback) => feedback._id !== id));
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      alert('Failed to delete feedback');
+    }
+  };
 
   if (loading) {
     return <p>Loading feedbacks...</p>;
@@ -111,7 +130,7 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
             <h2 className="subtitle--text mb-9">Your Feedbacks</h2>
             {feedbacks.length > 0 ? (
           feedbacks.map((feedback) => (
-            <div key={feedback.createdAt} className="mb-6 p-4 border rounded shadow ">
+            <div key={feedback._id} className="mb-6 p-4 border rounded shadow">
               <h3 className='subtitle--text py-2 px-5 rounded-lg bg-blue-300 
               text-white mb-4'>
                 Rating: {feedback.rating} / 10
@@ -119,26 +138,41 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
               <h3 className='text--normal'>
                 Strengths:
               </h3>
-              <ul className="list-disc ml-6 small--text">
+              <ul className="ml-6 small--text">
                 {feedback.strengths.map((strength, idx) => (
-                  <li key={idx}>{strength}</li>
+                  <li key={idx} className='flex items-start gap-2'>
+                    <Image src="/images/plus.svg" width={20} height={20} alt="+"></Image>
+                    {strength}
+                  </li>
                 ))}
               </ul>
               <h3 className='text--normal'>
                 Weaknesses:
               </h3>
-              <ul className="list-disc ml-6 small--text mb-4">
+              <ul className="ml-6 small--text mb-4">
                 {feedback.weaknesses.map((weakness, idx) => (
-                  <li key={idx}>{weakness}</li>
+                  <li key={idx} className='flex items-start gap-2'>
+                    <Image src="/images/minus.svg" width={20} height={20} alt="-"></Image>
+                    {weakness}
+                  </li>
                 ))}
               </ul>
-              <div className='mb-3'>
+              <div className='mb-5'>
                 <h3 className='text--normal'>Summary:</h3>
                 <p className='small--text'>{feedback.summary}</p>
               </div>
-              <p className="text-sm text-gray-500">
-                Submitted on: {new Date(feedback.createdAt).toLocaleDateString()}
-              </p>
+              <div className='flex items-center justify-between'>
+                <p className="text-sm text-gray-500">
+                  Submitted on: {new Date(feedback.createdAt).toLocaleDateString()}
+                </p>
+                <button
+                  onClick={() => handleDeleteFeedback(feedback._id)}
+                  className='text--normal py-1 px-4 bg-red-400 text-white 
+                  rounded-lg'
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         ) : (
@@ -156,9 +190,9 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
                 Support the project: buymeacoffee.com/vxdosick
                 </Link>
             </div>
-            <Link href="/resume-summary" className="link--normal">Privacy Policy</Link>
+            <Link href="/" className="link--normal">Privacy Policy</Link>
           </div>
-          <Link href="/resume-summary" className="logo--smalltext 
+          <Link href="/" className="logo--smalltext 
           text-center">ResumeScanAi</Link>
         </div>
       </footer>
