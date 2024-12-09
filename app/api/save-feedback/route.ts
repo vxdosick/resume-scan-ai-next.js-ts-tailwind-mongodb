@@ -7,88 +7,91 @@ dotenv.config();
 
 // POST: Сохранение отзыва
 export async function POST(request: Request) {
-    try {
-      const { username, rating, strengths, weaknesses, summary } = await request.json();
-  
-      // Проверка на наличие всех необходимых полей
-      if (!username || !rating || !strengths || !weaknesses || !summary) {
-        return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
-      }
-  
-      await connectToDatabase();
-  
-      // Создаём новый отзыв с датой создания
-      const feedback = new Feedback({
-        username,
-        rating,
-        strengths,
-        weaknesses,
-        summary,
-        createdAt: new Date(), // Добавляем текущую дату
-      });
-      console.log(feedback);
-      await feedback.save();
-      
-  
-      return NextResponse.json({
-        message: 'Feedback saved successfully',
-        feedback: {
-          username,
-          rating,
-          strengths,
-          weaknesses,
-          summary,
-          createdAt: feedback.createdAt,
-        },
-      });
-    } catch (error) {
-      console.error('Error saving feedback:', error);
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  try {
+    const { username, rating, strengths, weaknesses, summary, fileName } =
+      await request.json();
+
+    // Проверка на наличие всех необходимых полей
+    if (!username || !rating || !strengths || !weaknesses || !summary || !fileName) {
+      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
+
+    await connectToDatabase();
+
+    // Проверяем количество сохранённых резюме для данного пользователя
+    const feedbackCount = await Feedback.countDocuments({ username });
+
+    if (feedbackCount >= 3) {
+      return NextResponse.json({
+        error: 'You can only save up to 3 resumes. Upgrade your plan to save more.',
+      }, { status: 403 });
+    }
+
+    // Сохраняем отзыв в базе данных
+    const feedback = new Feedback({
+      username,
+      rating,
+      strengths,
+      weaknesses,
+      summary,
+      fileName, // Сохраняем название файла
+      createdAt: new Date(),
+    });
+
+    await feedback.save();
+
+    return NextResponse.json({
+      message: "Feedback saved successfully",
+      feedback,
+    });
+  } catch (error) {
+    console.error("Error saving feedback:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
+}
 
 // GET: Получение отзывов для пользователя
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const username = searchParams.get('username');
-  
-    if (!username) {
-      return NextResponse.json({ error: 'Username is required' }, { status: 400 });
-    }
-  
-    try {
-      await connectToDatabase();
-  
-      const feedbacks = await Feedback.find({ username }).sort({ createdAt: -1 });
-  
-      return NextResponse.json(feedbacks);
-    } catch (error) {
-      console.error('Error fetching feedbacks:', error);
-      return NextResponse.json({ error: 'Failed to fetch feedbacks' }, { status: 500 });
-    }
-  }
-  
+  const { searchParams } = new URL(req.url);
+  const username = searchParams.get('username');
 
-  export async function DELETE(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-  
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
-    }
-  
-    try {
-      await connectToDatabase();
-  
-      const result = await Feedback.findByIdAndDelete(id);
-  
-      if (!result) {
-        return NextResponse.json({ error: 'Feedback not found' }, { status: 404 });
-      }
-  
-      return NextResponse.json({ message: 'Feedback deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting feedback:', error);
-      return NextResponse.json({ error: 'Failed to delete feedback' }, { status: 500 });
-    }
+  if (!username) {
+    return NextResponse.json({ error: 'Username is required' }, { status: 400 });
   }
+
+  try {
+    await connectToDatabase();
+
+    const feedbacks = await Feedback.find({ username }).sort({ createdAt: -1 });
+
+    return NextResponse.json(feedbacks);
+  } catch (error) {
+    console.error('Error fetching feedbacks:', error);
+    return NextResponse.json({ error: 'Failed to fetch feedbacks' }, { status: 500 });
+  }
+}
+
+// DELETE: Удаление отзыва
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+  }
+
+  try {
+    await connectToDatabase();
+
+    const result = await Feedback.findByIdAndDelete(id);
+
+    if (!result) {
+      return NextResponse.json({ error: 'Feedback not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Feedback deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting feedback:', error);
+    return NextResponse.json({ error: 'Failed to delete feedback' }, { status: 500 });
+  }
+}

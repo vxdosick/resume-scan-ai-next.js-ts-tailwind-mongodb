@@ -81,11 +81,10 @@ const DashboardContent = () => {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
-    const file = e.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
+      const file = e.target.files[0];
+      setFile(file);
+      setFileName(file.name); // Обновляем состояние для отображения имени файла
+      localStorage.setItem("fileName", file.name); // Сохраняем название файла в localStorage
     } else {
       setFileName("No file selected");
     }
@@ -97,6 +96,7 @@ const DashboardContent = () => {
     if (droppedFile) {
       setFile(droppedFile);
       setFileName(droppedFile.name);
+      localStorage.setItem("fileName", droppedFile.name); // Сохраняем название файла в localStorage
     } else {
       setFileName("No file selected");
     }

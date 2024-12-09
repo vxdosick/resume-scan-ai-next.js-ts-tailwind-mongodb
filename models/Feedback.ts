@@ -7,6 +7,7 @@ interface Feedback extends Document {
   weaknesses: string[];
   summary: string;
   createdAt: Date;
+  fileName: string; // Название файла
 }
 
 const FeedbackSchema = new Schema<Feedback>({
@@ -15,6 +16,7 @@ const FeedbackSchema = new Schema<Feedback>({
   strengths: { type: [String], required: true },
   weaknesses: { type: [String], required: true },
   summary: { type: String, required: true },
+  fileName: { type: String, required: true }, // Название файла
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 export interface Feedback {
   rating: number;
   strengths: string[];
   weaknesses: string[];
   summary: string;
+  fileName: string; // Название файла
 }
 
 const ResumeSummary = () => {
@@ -51,11 +52,12 @@ const ResumeSummary = () => {
     setSaving(true);
     setSaveSuccess(null);
 
-    const userId = localStorage.getItem("userId"); // Проверяем наличие userId
+    const userId = localStorage.getItem("userId");
+    const fileName = localStorage.getItem("fileName"); // Извлекаем название файла
 
-    if (!userId || !username || !feedback) {
+    if (!userId || !username || !feedback || !fileName) {
       setSaveSuccess(
-        "Failed to save feedback: User not logged in or no feedback available"
+        "Failed to save feedback: User not logged in, no feedback available, or file name missing"
       );
       setSaving(false);
       return;
@@ -69,7 +71,8 @@ const ResumeSummary = () => {
         },
         body: JSON.stringify({
           username,
-          ...feedback, // Передаём весь объект `feedback`
+          ...feedback,
+          fileName, // Передаём название файла в запрос
         }),
       });
 
@@ -139,21 +142,22 @@ const ResumeSummary = () => {
         </div>
       </header>
       <main className="main">
-        <section className="rating bg-blue-300 py-10 main--marginbottom">
-          <div className="rating__container main__container text-center text-white">
-            <h1 className="title--text mb-4">Resume Analysis</h1>
-            <h2 className="subtitle--text">Rating: {feedback.rating} / 10</h2>
-            <button
-              onClick={handleSaveFeedback}
-              disabled={saving}
-              className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white 
-              rounded-lg"
-            >
-              {saving ? "Saving..." : "Save Feedback"}
-            </button>
-            {saveSuccess && <p className="mt-4 text--normal">{saveSuccess}</p>}
-          </div>
-        </section>
+      <section className="rating bg-blue-300 py-10 main--marginbottom">
+  <div className="rating__container main__container text-center text-white">
+      <h1 className="title--text mb-4">
+        Resume Analysis
+      </h1>
+    <h2 className="subtitle--text">Rating: {feedback.rating} / 10</h2>
+    <button
+      onClick={handleSaveFeedback}
+      disabled={saving}
+      className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white rounded-lg"
+    >
+      {saving ? "Saving..." : "Save Feedback"}
+    </button>
+    {saveSuccess && <p className="mt-4 text--normal">{saveSuccess}</p>}
+  </div>
+</section>
         <section className="strengths main--marginbottom">
           <div className="strengths__container main__container">
             <h2 className="subtitle--text mb-6 text-center">Strengths</h2>
