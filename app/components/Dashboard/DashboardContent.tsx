@@ -11,20 +11,18 @@ const DashboardContent = () => {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState<string | null>(null); // Для хранения имени пользователя
 
-  const isTokenExpired = (token: string | null): boolean => {
-    if (!token || token.split(".").length !== 3) {
-      console.error("Invalid token format");
-      return true; // Считаем токен истёкшим, если он некорректен
-    }
+   function isTokenExpired(token: string): boolean {
+  try {
+    // Разделяем токен на три части и декодируем payload
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    // Проверяем, истёк ли токен
+    return payload.exp * 1000 < Date.now();
+  } catch (error) {
+    console.error('Failed to decode token or invalid format:', error);
+    return true; // Если токен некорректен, считаем его истёкшим
+  }
+}
 
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Расшифровываем payload
-      return payload.exp * 1000 < Date.now();
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-      return true;
-    }
-  };
 
   const router = useRouter();
   const [fileName, setFileName] = useState<string>("No file selected");
@@ -33,12 +31,10 @@ const DashboardContent = () => {
     const validateUser = async () => {
       const token = localStorage.getItem("accessToken");
 
-      if (!token || isTokenExpired(token)) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("userId");
-        router.push("/login");
-        return;
-      }
+
+  if (!token || isTokenExpired(token)) {
+    router.push('/login'); // Редирект на страницу входа
+  }
 
       try {
         const response = await fetch("/api/auth/validate", {
@@ -63,7 +59,8 @@ const DashboardContent = () => {
               setUsername(userData.username); // Устанавливаем имя пользователя
             }
           }
-        } else {
+        } 
+        else {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("userId");
           router.push("/login");
@@ -143,10 +140,28 @@ const DashboardContent = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      // Отправляем запрос на API-роут
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+  
+      if (response.ok) {
+        // Успешный логаут: удаляем данные и переходим на страницу логина
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+        router.push('/login');
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
+  
+  
 
   return (
     <>
@@ -195,8 +210,6 @@ const DashboardContent = () => {
       <main className="main">
         <section className="hero main--marginbottom bg-blue-300 text-white">
           <div className="hero__container text-center py-[150px] relative">
-            <Image width={100} height={100} src="/images/bg.png" alt="background"
-            className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"></Image>
             <h1 className="title--text mb-2">Resume validity checker</h1>
             <h2 className="text--normal">
               AI-enabled resume verification is the future for employers, hr employees, and all other IT specialties
@@ -364,5 +377,4 @@ const DashboardContent = () => {
     </>
   );
 };
-
 export default DashboardContent;

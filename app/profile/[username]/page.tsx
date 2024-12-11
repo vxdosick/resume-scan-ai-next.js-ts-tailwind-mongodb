@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 interface Feedback {
   _id: string; // Добавлено поле для идентификатора отзыва
@@ -27,30 +27,57 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
 
   const [username, setUsername] = useState<string | null>(null);
 
+  // Распаковываем params с использованием useEffect
   useEffect(() => {
-    const resolveParams = async () => {
+    async function fetchParams() {
       const resolvedParams = await params;
-      setUsername(resolvedParams.username);
-    };
+      setUsername(resolvedParams.username); // Устанавливаем username после получения
+    }
 
-    resolveParams();
+    fetchParams();
   }, [params]);
 
+
+
+
+  function isTokenExpired(token: string): boolean {
+    try {
+      // Разделяем токен на три части и декодируем payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Проверяем, истёк ли токен
+      return payload.exp * 1000 < Date.now();
+    } catch (error) {
+      console.error('Failed to decode token or invalid format:', error);
+      return true; // Если токен некорректен, считаем его истёкшим
+    }
+  }
+  
+
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+
+    if (!token || isTokenExpired(token)) {
+      router.push('/login'); // Редирект на страницу входа
+    }
+
+
+
+
+
     if (!username) return;
 
     const fetchFeedbacks = async () => {
       try {
         const response = await fetch(`/api/save-feedback?username=${username}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch feedbacks');
+          throw new Error("Failed to fetch feedbacks");
         }
 
         const data = await response.json();
         setFeedbacks(data);
       } catch (err) {
-        console.error('Error fetching feedbacks:', err);
-        setError('An error occurred while fetching feedbacks');
+        console.error("Error fetching feedbacks:", err);
+        setError("An error occurred while fetching feedbacks");
       } finally {
         setLoading(false);
       }
@@ -62,18 +89,20 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
   const handleDeleteFeedback = async (id: string) => {
     try {
       const response = await fetch(`/api/save-feedback?id=${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete feedback');
+        throw new Error("Failed to delete feedback");
       }
 
       // Удаление отзыва из состояния
-      setFeedbacks((prevFeedbacks) => prevFeedbacks.filter((feedback) => feedback._id !== id));
+      setFeedbacks((prevFeedbacks) =>
+        prevFeedbacks.filter((feedback) => feedback._id !== id)
+      );
     } catch (error) {
-      console.error('Error deleting feedback:', error);
-      alert('Failed to delete feedback');
+      console.error("Error deleting feedback:", error);
+      alert("Failed to delete feedback");
     }
   };
 
@@ -85,16 +114,34 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
     return <p>Error: {error}</p>;
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      // Отправляем запрос на API-роут
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+  
+      if (response.ok) {
+        // Успешный логаут: удаляем данные и переходим на страницу логина
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+        router.push('/login');
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
     <>
       <header className="py-6">
         <div className="header__container flex justify-between items-center main__container">
-          <a href="/dashboard" className="logo--normaltext">ResumeScanAi</a>
+          <a href="/dashboard" className="logo--normaltext">
+            ResumeScanAi
+          </a>
           <nav className="header__menu">
             <ul className="flex items-center gap-8">
               <li>
@@ -104,8 +151,16 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
               </li>
               {username ? (
                 <li>
-                  <Link className="text--normal flex items-center gap-2" href={`/profile/${username}`}>
-                    <Image src="/images/avatar.svg" width={25} height={25} alt="avatar" />
+                  <Link
+                    className="text--normal flex items-center gap-2"
+                    href={`/profile/${username}`}
+                  >
+                    <Image
+                      src="/images/avatar.svg"
+                      width={25}
+                      height={25}
+                      alt="avatar"
+                    />
                     {username}
                   </Link>
                 </li>
@@ -128,9 +183,14 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
             <h2 className="subtitle--text mb-9">Your Feedbacks</h2>
             {feedbacks.length > 0 ? (
               feedbacks.map((feedback) => (
-                <div key={feedback._id} className="mb-6 p-4 border rounded shadow">
-                  <h3 className="subtitle--text py-2 px-5 rounded-lg bg-blue-300 
-                  text-white mb-4">
+                <div
+                  key={feedback._id}
+                  className="mb-6 p-4 border rounded shadow"
+                >
+                  <h3
+                    className="subtitle--text py-2 px-5 rounded-lg bg-blue-300 
+                  text-white mb-4"
+                  >
                     Rating: {feedback.rating} / 10
                   </h3>
                   <h3 className="text--normal">File Name:</h3>
@@ -141,7 +201,12 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
                   <ul className="ml-6 small--text">
                     {feedback.strengths.map((strength, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <Image src="/images/plus.svg" width={20} height={20} alt="+" />
+                        <Image
+                          src="/images/plus.svg"
+                          width={20}
+                          height={20}
+                          alt="+"
+                        />
                         {strength}
                       </li>
                     ))}
@@ -150,7 +215,12 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
                   <ul className="ml-6 small--text mb-4">
                     {feedback.weaknesses.map((weakness, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <Image src="/images/minus.svg" width={20} height={20} alt="-" />
+                        <Image
+                          src="/images/minus.svg"
+                          width={20}
+                          height={20}
+                          alt="-"
+                        />
                         {weakness}
                       </li>
                     ))}
@@ -161,7 +231,8 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500">
-                      Submitted on: {new Date(feedback.createdAt).toLocaleDateString()}
+                      Submitted on:{" "}
+                      {new Date(feedback.createdAt).toLocaleDateString()}
                     </p>
                     <button
                       onClick={() => handleDeleteFeedback(feedback._id)}
@@ -182,14 +253,29 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
         <div className="footer__container flex flex-col gap-1 main__container">
           <div className="flex items-center justify-between mb-9">
             <div className="flex items-center gap-2">
-              <Image width={30} height={30} src="/images/coffe.png" alt="image" />
-              <Link href="buymeacoffee.com/vxdosick" className="small--text">
+              <Image
+                width={30}
+                height={30}
+                src="/images/coffe.png"
+                alt="image"
+              />
+              <Link
+                href="buymeacoffee.com/vxdosick"
+                className="small--text"
+              >
                 Support the project: buymeacoffee.com/vxdosick
               </Link>
             </div>
-            <Link href="/" className="link--normal">Privacy Policy</Link>
+            <Link href="/" className="link--normal">
+              Privacy Policy
+            </Link>
           </div>
-          <Link href="/" className="logo--smalltext text-center">ResumeScanAi</Link>
+          <Link
+            href="/"
+            className="logo--smalltext text-center"
+          >
+            ResumeScanAi
+          </Link>
         </div>
       </footer>
     </>

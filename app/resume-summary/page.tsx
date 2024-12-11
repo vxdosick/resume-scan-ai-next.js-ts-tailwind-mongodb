@@ -21,8 +21,24 @@ const ResumeSummary = () => {
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null); // Сообщение об успехе или ошибке
 
   const [username, setUsername] = useState<string | null>(null); // Для отображения ссылки на профиль
-
+  function isTokenExpired(token: string): boolean {
+    try {
+      // Разделяем токен на три части и декодируем payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Проверяем, истёк ли токен
+      return payload.exp * 1000 < Date.now();
+    } catch (error) {
+      console.error('Failed to decode token or invalid format:', error);
+      return true; // Если токен некорректен, считаем его истёкшим
+    }
+  }
   useEffect(() => {
+
+    const token = localStorage.getItem('accessToken');
+
+  if (!token || isTokenExpired(token)) {
+    router.push('/login'); // Редирект на страницу входа
+  }
     const data = localStorage.getItem("resumeFeedback");
     if (data) {
       const parsedData = JSON.parse(data);
@@ -94,9 +110,27 @@ const ResumeSummary = () => {
     return <p>Loading feedback...</p>;
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      // Отправляем запрос на API-роут
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+  
+      if (response.ok) {
+        // Успешный логаут: удаляем данные и переходим на страницу логина
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+        localStorage.removeItem("fileName");
+        localStorage.removeItem("resumeFeedback");
+        router.push('/login');
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
@@ -142,22 +176,20 @@ const ResumeSummary = () => {
         </div>
       </header>
       <main className="main">
-      <section className="rating bg-blue-300 py-10 main--marginbottom">
-  <div className="rating__container main__container text-center text-white">
-      <h1 className="title--text mb-4">
-        Resume Analysis
-      </h1>
-    <h2 className="subtitle--text">Rating: {feedback.rating} / 10</h2>
-    <button
-      onClick={handleSaveFeedback}
-      disabled={saving}
-      className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white rounded-lg"
-    >
-      {saving ? "Saving..." : "Save Feedback"}
-    </button>
-    {saveSuccess && <p className="mt-4 text--normal">{saveSuccess}</p>}
-  </div>
-</section>
+        <section className="rating bg-blue-300 py-10 main--marginbottom">
+          <div className="rating__container main__container text-center text-white">
+            <h1 className="title--text mb-4">Resume Analysis</h1>
+            <h2 className="subtitle--text">Rating: {feedback.rating} / 10</h2>
+            <button
+              onClick={handleSaveFeedback}
+              disabled={saving}
+              className="mt-4 py-2 px-4 text--normal bg-purple-400 text-white rounded-lg"
+            >
+              {saving ? "Saving..." : "Save Feedback"}
+            </button>
+            {saveSuccess && <p className="mt-4 text--normal">{saveSuccess}</p>}
+          </div>
+        </section>
         <section className="strengths main--marginbottom">
           <div className="strengths__container main__container">
             <h2 className="subtitle--text mb-6 text-center">Strengths</h2>
@@ -213,10 +245,10 @@ const ResumeSummary = () => {
         <div className="footer__container flex flex-col gap-1 main__container">
           <div className="flex items-center justify-between mb-9">
             <div className="flex items-center gap-2">
-                <Image width={30} height={30} src="/images/coffe.png" alt="image"></Image>
-                <Link href="buymeacoffee.com/vxdosick" className="small--text">
+              <Image width={30} height={30} src="/images/coffe.png" alt="image" />
+              <Link href="buymeacoffee.com/vxdosick" className="small--text">
                 Support the project: buymeacoffee.com/vxdosick
-                </Link>
+              </Link>
             </div>
             <Link href="/" className="link--normal">Privacy Policy</Link>
           </div>

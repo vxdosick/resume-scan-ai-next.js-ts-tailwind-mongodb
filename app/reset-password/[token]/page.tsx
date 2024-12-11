@@ -1,30 +1,30 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Notification from '@/app/components/Notification';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Notification from "@/app/components/Notification";
 
 const ResetPasswordToken = ({ params }: { params: { token: string } }) => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return;
     }
 
     const response = await fetch(`/api/auth/reset-password/${params.token}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ password }),
     });
@@ -32,10 +32,10 @@ const ResetPasswordToken = ({ params }: { params: { token: string } }) => {
     const data = await response.json();
 
     if (response.ok) {
-      setSuccess('Password successfully reset. Redirecting to dashboard...');
-      setTimeout(() => router.push('/dashboard'), 3000);
+      setSuccess("Password successfully reset. Redirecting to login...");
+      setTimeout(() => router.push("/login"), 3000);
     } else {
-      setError(data.message || 'Failed to reset password.');
+      setError(data.message || "Failed to reset password.");
     }
   };
 
@@ -43,8 +43,10 @@ const ResetPasswordToken = ({ params }: { params: { token: string } }) => {
     <div className="wrapper">
       <main className="flex items-center justify-center flex-col h-screen">
         <h1 className="text-2xl text-center mb-4">Reset Your Password</h1>
-        {error && <Notification message={error} onClose={() => setError('')} />}
-        {success && <Notification message={success} onClose={() => setSuccess('')} />}
+        {error && <Notification message={error} onClose={() => setError("")} />}
+        {success && (
+          <Notification message={success} onClose={() => setSuccess("")} />
+        )}
         <form onSubmit={handleSubmit}>
           <input
             type="password"
@@ -60,8 +62,10 @@ const ResetPasswordToken = ({ params }: { params: { token: string } }) => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="block mb-4 p-2 border rounded"
           />
-          <button type="submit" className="py-2 w-full text--normal bg-blue-300 
-            text-white rounded-lg">
+          <button
+            type="submit"
+            className="py-2 w-full text--normal bg-blue-300 text-white rounded-lg"
+          >
             Reset Password
           </button>
         </form>
@@ -69,5 +73,4 @@ const ResetPasswordToken = ({ params }: { params: { token: string } }) => {
     </div>
   );
 };
-
 export default ResetPasswordToken;
