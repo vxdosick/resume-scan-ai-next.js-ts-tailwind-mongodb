@@ -31,7 +31,7 @@ export async function POST() {
       { message: 'Logged out successfully' },
       {
         headers: {
-          'Set-Cookie': `refreshToken=; HttpOnly; Path=/; Max-Age=0`,
+          'Set-Cookie': `accessToken=; HttpOnly; Path=/; Max-Age=0`, // Удаляем токен
         },
       }
     );

@@ -55,13 +55,14 @@ export async function POST(request: Request) {
     await user.save();
 
     return NextResponse.json(
-      { accessToken, userId: user._id, username: user.username }, // Добавление userId в ответ
+      { accessToken, userId: user._id, username: user.username },
       {
         headers: {
-          'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}`,
+          'Set-Cookie': `accessToken=${accessToken}; HttpOnly; Path=/; Max-Age=${60 * 60}`, // Устанавливаем токен в куки
         },
       }
     );
+    
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ message: 'Login error' }, { status: 500 });
