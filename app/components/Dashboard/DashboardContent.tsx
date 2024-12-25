@@ -9,79 +9,39 @@ const DashboardContent = () => {
   const [file, setFile] = useState<File | null>(null);
   const [companyType, setCompanyType] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState<string | null>(null); // Для хранения имени пользователя
-
-   function isTokenExpired(token: string): boolean {
-  try {
-    // Разделяем токен на три части и декодируем payload
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    // Проверяем, истёк ли токен
-    return payload.exp * 1000 < Date.now();
-  } catch (error) {
-    console.error('Failed to decode token or invalid format:', error);
-    return true; // Если токен некорректен, считаем его истёкшим
-  }
-}
-
-
-  const router = useRouter();
+  const [username, setUsername] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("No file selected");
 
+  const router = useRouter();
+
   useEffect(() => {
-    const validateUser = async () => {
-      const token = localStorage.getItem("accessToken");
-
-
-  if (!token || isTokenExpired(token)) {
-    router.push('/login'); // Редирект на страницу входа
-  }
-
+    const fetchUserData = async () => {
       try {
-        const response = await fetch("/api/auth/validate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+          const userResponse = await fetch(`/api/user`, {
+            headers: { "user-id": userId },
+          });
 
-        const data = await response.json();
-
-        if (data.valid) {
-          const userId = localStorage.getItem("userId");
-          if (userId) {
-            const userResponse = await fetch(`/api/user`, {
-              headers: { "user-id": userId },
-            });
-
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              setUsername(userData.username); // Устанавливаем имя пользователя
-            }
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            setUsername(userData.username); // Устанавливаем имя пользователя
           }
-        } 
-        else {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("userId");
-          router.push("/login");
         }
       } catch (error) {
-        console.error("Error validating token:", error);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("userId");
-        router.push("/login");
+        console.error("Error fetching user data:", error);
       }
     };
 
-    validateUser();
-  }, [router]);
+    fetchUserData();
+  }, []);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setFile(file);
-      setFileName(file.name); // Обновляем состояние для отображения имени файла
-      localStorage.setItem("fileName", file.name); // Сохраняем название файла в localStorage
+      setFileName(file.name);
+      localStorage.setItem("fileName", file.name);
     } else {
       setFileName("No file selected");
     }
@@ -93,7 +53,7 @@ const DashboardContent = () => {
     if (droppedFile) {
       setFile(droppedFile);
       setFileName(droppedFile.name);
-      localStorage.setItem("fileName", droppedFile.name); // Сохраняем название файла в localStorage
+      localStorage.setItem("fileName", droppedFile.name);
     } else {
       setFileName("No file selected");
     }
@@ -142,16 +102,15 @@ const DashboardContent = () => {
 
   const handleLogout = async () => {
     try {
-      // Отправляем запрос на API-роут
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
       });
   
       if (response.ok) {
-        // Успешный логаут: удаляем данные и переходим на страницу логина
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
         localStorage.removeItem("username");
+        localStorage.removeItem("fileName");
         router.push('/login');
       } else {
         console.error('Failed to log out');
@@ -161,8 +120,6 @@ const DashboardContent = () => {
     }
   };
   
-  
-
   return (
     <>
       <header className="py-6">

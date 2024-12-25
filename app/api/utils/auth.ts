@@ -1,12 +1,12 @@
 function isTokenExpired(token: string): boolean {
   try {
-    if (token.split('.').length !== 3) return true; // Проверяем формат токена
+    if (token.split('.').length !== 3) return true;
 
-    const payload = JSON.parse(atob(token.split('.')[1])); // Декодируем payload
-    return payload.exp * 1000 < Date.now(); // Проверяем, истёк ли токен
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
   } catch (error) {
     console.error('Error decoding token:', error);
-    return true; // Если ошибка при декодировании, считаем токен истёкшим
+    return true;
   }
 }
 
@@ -14,23 +14,20 @@ export async function getAccessToken(): Promise<string> {
   try {
     const token = localStorage.getItem('accessToken');
 
-    // Проверяем, есть ли токен и не истёк ли он
     if (token && !isTokenExpired(token)) {
       return token;
     }
 
-    // Если токена нет или он истёк, обновляем его
     const response = await fetch('/api/auth/refresh', {
       method: 'POST',
-      credentials: 'include', // Для отправки cookies с Refresh Token
+      credentials: 'include',
     });
 
     if (response.ok) {
       const { accessToken } = await response.json();
-      localStorage.setItem('accessToken', accessToken); // Сохраняем новый Access Token
+      localStorage.setItem('accessToken', accessToken);
       return accessToken;
     } else {
-      // Обработка ошибок
       const errorData = await response.json();
       console.error('Failed to refresh token:', errorData.message || 'Unknown error');
       throw new Error('Failed to refresh token');

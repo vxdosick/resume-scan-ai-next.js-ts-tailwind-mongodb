@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Notification from '../components/Notification'; // Компонент для уведомлений
+import Notification from '../components/Notification';
 
 const Register = () => {
-  const [email, setEmail] = useState(''); // Стейт для email
-  const [username, setUsername] = useState(''); // Стейт для имени пользователя
-  const [password, setPassword] = useState(''); // Стейт для пароля
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState(''); // Стейт для подтверждения пароля
   const [error, setError] = useState(''); // Стейт для ошибок
   const router = useRouter(); // Для перенаправления

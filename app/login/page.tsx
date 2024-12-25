@@ -5,38 +5,42 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const Login = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState(''); // Поле для ввода email или имени пользователя
-  const [password, setPassword] = useState(''); // Поле для ввода пароля
-  const [error, setError] = useState(''); // Стейт для отображения ошибок
-  const router = useRouter(); // Навигация в Next.js
+  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // Сбрасываем ошибки
-
+    setError('');
+  
     try {
-      // Отправляем запрос на сервер
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailOrUsername, password }),
       });
-
-      if (response.ok) {
-        const { accessToken, userId, username } = await response.json();
-        localStorage.setItem('accessToken', accessToken); // Сохраняем токен в localStorage
-        localStorage.setItem('userId', userId); // Сохраняем userId
-        localStorage.setItem('username', username); // Сохраняем username
-        router.push('/dashboard'); // Перенаправляем пользователя на дашборд
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Login failed'); // Отображаем сообщение об ошибке
+  
+      // Проверяем, успешен ли запрос
+      if (!response.ok) {
+        const data = await response.json().catch(() => null); // Обработка не-JSON ответа
+        throw new Error(data?.message || `Login failed with status ${response.status}`);
       }
+  
+      const { userId, username } = await response.json();
+  
+      // Сохраняем только необходимые данные
+      localStorage.setItem('userId', userId);
+      localStorage.setItem('username', username);
+  
+      // Перенаправляем пользователя на Dashboard
+      router.push('/dashboard');
     } catch (err) {
-      console.error('Login error:', err);
-      setError('An error occurred. Please try again later.');
+      console.error('Login error:', err || err);
+      setError(err +'An error occurred. Please try again later.');
     }
   };
+  
 
   return (
     <div className="wrapper">

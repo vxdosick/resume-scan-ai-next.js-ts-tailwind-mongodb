@@ -2,39 +2,32 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Feedback from '@/models/Feedback';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
-// POST: Сохранение отзыва
 export async function POST(request: Request) {
   try {
     const { username, rating, strengths, weaknesses, summary, fileName } =
       await request.json();
 
-    // Проверка на наличие всех необходимых полей
     if (!username || !rating || !strengths || !weaknesses || !summary || !fileName) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     await connectToDatabase();
 
-    // Проверяем количество сохранённых резюме для данного пользователя
     const feedbackCount = await Feedback.countDocuments({ username });
 
     if (feedbackCount >= 3) {
       return NextResponse.json({
-        error: 'You can only save up to 3 resumes. Upgrade your plan to save more.',
+        error: 'You can only save up to 3 resumes.',
       }, { status: 403 });
     }
 
-    // Сохраняем отзыв в базе данных
     const feedback = new Feedback({
       username,
       rating,
       strengths,
       weaknesses,
       summary,
-      fileName, // Сохраняем название файла
+      fileName,
       createdAt: new Date(),
     });
 
@@ -50,7 +43,6 @@ export async function POST(request: Request) {
   }
 }
 
-// GET: Получение отзывов для пользователя
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const username = searchParams.get('username');
@@ -71,7 +63,6 @@ export async function GET(req: Request) {
   }
 }
 
-// DELETE: Удаление отзыва
 export async function DELETE(req: Request) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');

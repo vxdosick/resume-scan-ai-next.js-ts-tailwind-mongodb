@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface Feedback {
-  _id: string; // Добавлено поле для идентификатора отзыва
+  _id: string; // Идентификатор отзыва
   rating: number;
   strengths: string[];
   weaknesses: string[];
@@ -24,46 +24,26 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [username, setUsername] = useState<string | null>(null);
 
-  // Распаковываем params с использованием useEffect
+  // Асинхронная распаковка params
   useEffect(() => {
-    async function fetchParams() {
-      const resolvedParams = await params;
-      setUsername(resolvedParams.username); // Устанавливаем username после получения
-    }
+    const fetchParams = async () => {
+      try {
+        const resolvedParams = await params; // Распаковываем Promise
+        if (resolvedParams?.username) {
+          setUsername(resolvedParams.username);
+        }
+      } catch (error) {
+        console.error("Failed to resolve params:", error);
+      }
+    };
 
     fetchParams();
   }, [params]);
 
-
-
-
-  function isTokenExpired(token: string): boolean {
-    try {
-      // Разделяем токен на три части и декодируем payload
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      // Проверяем, истёк ли токен
-      return payload.exp * 1000 < Date.now();
-    } catch (error) {
-      console.error('Failed to decode token or invalid format:', error);
-      return true; // Если токен некорректен, считаем его истёкшим
-    }
-  }
-  
-
+  // Получаем отзывы пользователя
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-
-    if (!token || isTokenExpired(token)) {
-      router.push('/login'); // Редирект на страницу входа
-    }
-
-
-
-
-
     if (!username) return;
 
     const fetchFeedbacks = async () => {
@@ -86,6 +66,7 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
     fetchFeedbacks();
   }, [username]);
 
+  // Удаление отзыва
   const handleDeleteFeedback = async (id: string) => {
     try {
       const response = await fetch(`/api/save-feedback?id=${id}`, {
@@ -106,23 +87,14 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
     }
   };
 
-  if (loading) {
-    return <p>Loading feedbacks...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
+  // Логаут пользователя
   const handleLogout = async () => {
     try {
-      // Отправляем запрос на API-роут
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
       });
   
       if (response.ok) {
-        // Успешный логаут: удаляем данные и переходим на страницу логина
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
         localStorage.removeItem("username");
@@ -134,6 +106,16 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
       console.error('Error during logout:', error);
     }
   };
+
+  // Загрузка данных
+  if (loading) {
+    return <p>Loading feedbacks...</p>;
+  }
+
+  // Ошибка при загрузке
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>

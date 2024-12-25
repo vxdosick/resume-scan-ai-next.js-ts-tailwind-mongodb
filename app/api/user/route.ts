@@ -1,17 +1,15 @@
 import { NextResponse } from 'next/server';
 import { MongoClient, ObjectId } from 'mongodb';
 
-const uri = process.env.MONGO_URI || ''; // MongoDB URI
+const uri = process.env.MONGO_URI || '';
 
 export async function GET(req: Request) {
   const client = new MongoClient(uri);
 
   try {
-    // Подключение к базе данных
     await client.connect();
     const db = client.db();
 
-    // Извлечение ID пользователя из заголовка
     const userId = req.headers.get('user-id');
     if (!userId) {
       return NextResponse.json({ error: 'User ID not provided' }, { status: 400 });
@@ -23,7 +21,6 @@ export async function GET(req: Request) {
 
     const userObjectId = new ObjectId(userId);
 
-    // Поиск пользователя
     const user = await db.collection('users').findOne({ _id: userObjectId });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -34,6 +31,6 @@ export async function GET(req: Request) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   } finally {
-    await client.close(); // Закрытие соединения
+    await client.close();
   }
 }

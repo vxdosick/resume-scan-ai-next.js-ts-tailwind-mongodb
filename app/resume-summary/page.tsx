@@ -21,24 +21,9 @@ const ResumeSummary = () => {
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null); // Сообщение об успехе или ошибке
 
   const [username, setUsername] = useState<string | null>(null); // Для отображения ссылки на профиль
-  function isTokenExpired(token: string): boolean {
-    try {
-      // Разделяем токен на три части и декодируем payload
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      // Проверяем, истёк ли токен
-      return payload.exp * 1000 < Date.now();
-    } catch (error) {
-      console.error('Failed to decode token or invalid format:', error);
-      return true; // Если токен некорректен, считаем его истёкшим
-    }
-  }
+
+  // Загрузка данных при монтировании компонента
   useEffect(() => {
-
-    const token = localStorage.getItem('accessToken');
-
-  if (!token || isTokenExpired(token)) {
-    router.push('/login'); // Редирект на страницу входа
-  }
     const data = localStorage.getItem("resumeFeedback");
     if (data) {
       const parsedData = JSON.parse(data);
@@ -64,6 +49,7 @@ const ResumeSummary = () => {
     }
   }, []);
 
+  // Сохранение отзыва
   const handleSaveFeedback = async () => {
     setSaving(true);
     setSaveSuccess(null);
@@ -106,13 +92,9 @@ const ResumeSummary = () => {
     }
   };
 
-  if (!feedback) {
-    return <p>Loading feedback...</p>;
-  }
-
+  // Логаут пользователя
   const handleLogout = async () => {
     try {
-      // Отправляем запрос на API-роут
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
       });
@@ -132,6 +114,10 @@ const ResumeSummary = () => {
       console.error('Error during logout:', error);
     }
   };
+
+  if (!feedback) {
+    return <p>Loading feedback...</p>;
+  }
 
   return (
     <>
