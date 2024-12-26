@@ -157,7 +157,7 @@ const StartingPageComponent = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer link="/"/>
     </>
   );
 };

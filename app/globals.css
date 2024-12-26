@@ -48,6 +48,10 @@
     padding-top: 20px;
     border-top: 1px solid rgba(181, 181, 181, 0.609);
 }
+.about__image {
+    width: 100px;
+    height: 100px;
+}
 
 
 @media(max-width: 970px) {

@@ -29,7 +29,8 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith('/_next/static') ||
     pathname.startsWith('/_next/image') ||
-    pathname === '/favicon.ico'
+    pathname === '/favicon.ico' ||
+    pathname.includes('/images')
   ) {
     return NextResponse.next();
   }
@@ -45,7 +46,6 @@ export async function middleware(request: NextRequest) {
     console.log(`[Middleware] Публичный API-маршрут: ${pathname} — доступ разрешён.`);
     return NextResponse.next();
   }
-
   // ✅ 4. Проверяем токен
   const token = request.cookies.get('accessToken')?.value;
 
@@ -67,6 +67,6 @@ export async function middleware(request: NextRequest) {
 // 🔄 Применяем Middleware к маршрутам
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)', // Исключаем статические файлы
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

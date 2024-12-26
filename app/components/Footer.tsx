@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const Footer = () => {
+const Footer = (props: { link: string }) => {
     return (
         <footer className="footer py-6">
           <div className="footer__container flex flex-col gap-1 main__container">
@@ -13,17 +13,17 @@ const Footer = () => {
                   src="/images/coffe.png"
                   alt="image"
                 />
-                <Link href="buymeacoffee.com/vxdosick" className="small--text">
+                <Link href="https://buymeacoffee.com/vxdosick" className="small--text">
                   Support the project
                 </Link>
               </div>
               <Link
-                href="/"
+                href={props.link}
                 className="footer__logo logo--smalltext text-center absolute left-1/2 transform -translate-x-1/2"
               >
                 ResumeScanAi
               </Link>
-              <Link href="/" className="link--normal">
+              <Link href='/' className="link--normal">
                 Privacy Policy
               </Link>
             </div>

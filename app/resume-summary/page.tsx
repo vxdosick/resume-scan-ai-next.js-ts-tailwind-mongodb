@@ -293,7 +293,7 @@ const ResumeSummary = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer link="/resume-summary"/>
     </>
   );
 };

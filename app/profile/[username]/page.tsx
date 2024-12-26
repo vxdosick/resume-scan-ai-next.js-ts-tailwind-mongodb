@@ -27,6 +27,14 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
   const [error, setError] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [burgerOpen, setBurgerOpen] = useState(false);
+  const [expandedFeedbackIds, setExpandedFeedbackIds] = useState<string[]>([]); // Отслеживаем развернутые элементы
+
+const handleOpenSummary = (id: string) => {
+  setExpandedFeedbackIds((prevIds) => {
+    // Переключаем состояние развернутости для кликнутого элемента
+    return prevIds.includes(id) ? prevIds.filter((_id) => _id !== id) : [...prevIds, id];
+  });
+};
   const handeBurger = () => {
     setBurgerOpen(!burgerOpen);
   };
@@ -225,26 +233,44 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
           )}
         </div>
       </header>
-      <main className="main">
+      <main className="main min-h-[765px]">
         <section className="history main--marginbottom">
           <div className="history__container main__container">
             <h2 className="subtitle--text mb-9">Your Feedbacks</h2>
             {feedbacks.length > 0 ? (
               feedbacks.map((feedback) => (
                 <div
-                  key={feedback._id}
-                  className="mb-6 p-4 border rounded shadow"
+                  key={feedback._id} 
+                  className="mb-10 overflow-hidden relative"
                 >
+                  <div className="flex justify-between items-center subtitle--text py-2 
+                  px-5 
+                  rounded-lg bg-blue-300 
+                  text-white mb-4">
                   <h3
-                    className="subtitle--text py-2 px-5 rounded-lg bg-blue-300 
-                  text-white mb-4"
                   >
                     Rating: {feedback.rating} / 10
                   </h3>
-                  <h3 className="text--normal">File Name:</h3>
-                  <p className="ml-6 small--text mb-4">
-                    {feedback.fileName || "No file name available"}
-                  </p>
+                  <button className="title--text" 
+                  onClick={() => handleOpenSummary(feedback._id)}>
+    {expandedFeedbackIds.includes(feedback._id) ? '↑' : '↓'}
+                  </button>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text--normal">File Name:</h3>
+                      <p className="ml-6 small--text mb-4">
+                        {feedback.fileName || "No file name available"}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteFeedback(feedback._id)}
+                      className="text--normal py-1 px-4 bg-red-400 text-white rounded-lg"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <div style={{ display: expandedFeedbackIds.includes(feedback._id) ? 'block' : 'none' }}>
                   <h3 className="text--normal">Strengths:</h3>
                   <ul className="ml-6 small--text">
                     {feedback.strengths.map((strength, idx) => (
@@ -277,27 +303,23 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
                     <h3 className="text--normal">Summary:</h3>
                     <p className="small--text">{feedback.summary}</p>
                   </div>
+                  </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500">
                       Submitted on:{" "}
                       {new Date(feedback.createdAt).toLocaleDateString()}
                     </p>
-                    <button
-                      onClick={() => handleDeleteFeedback(feedback._id)}
-                      className="text--normal py-1 px-4 bg-red-400 text-white rounded-lg"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
               ))
             ) : (
-              <p>No feedbacks found.</p>
+              <h1 className="text--normal text-center">
+                Scan your CV and save your feedback.</h1>
             )}
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer link={'/profile' + '/' + username}/>
     </>
   );
 };

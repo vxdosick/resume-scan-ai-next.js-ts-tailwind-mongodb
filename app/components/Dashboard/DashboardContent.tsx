@@ -541,7 +541,7 @@ const DashboardContent = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer link= "/dashboard" />
     </>
   );
 };
