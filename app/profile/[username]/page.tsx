@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import Footer from "@/app/components/Footer";
 
 interface Feedback {
   _id: string; // Идентификатор отзыва
@@ -25,6 +26,10 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [burgerOpen, setBurgerOpen] = useState(false);
+  const handeBurger = () => {
+    setBurgerOpen(!burgerOpen);
+  };
 
   // Асинхронная распаковка params
   useEffect(() => {
@@ -142,7 +147,7 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
                       width={25}
                       height={25}
                       alt="avatar"
-                    />
+                    ></Image>
                     {username}
                   </Link>
                 </li>
@@ -157,6 +162,67 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
               </li>
             </ul>
           </nav>
+        </div>
+        <div className="header__container--mobile flex justify-between items-center main__container">
+          <div className="flex justify-between">
+            <Link href="/dashboard" className="logo--normaltext">
+              ResumeScanAi
+            </Link>
+            <button
+              className="header__burger inline-block align-end font-bold 
+            text-blue-300 text-[25px]"
+              onClick={handeBurger}
+            >
+              &#9776;
+            </button>
+          </div>
+          {burgerOpen && (
+            <nav className="header__menu">
+              <ul
+                className="flex flex-col items-center gap-8 fixed z-10 top-[70px] 
+            right-[15px]
+             border border-blue-300 bg-white pb-7 px-6 pt-8"
+              >
+                <li className="absolute top-[8px] right-[8px]">
+                  <button
+                    onClick={handeBurger}
+                    className="border border-blue-300 px-2 py-1 rounded-md"
+                  >
+                    &#10005;
+                  </button>
+                </li>
+                <li>
+                <Link className="text--normal" href="/dashboard">
+                  Home
+                </Link>
+              </li>
+              {username ? (
+                <li>
+                  <Link
+                    className="text--normal flex items-center gap-2"
+                    href={`/profile/${username}`}
+                  >
+                    <Image
+                      src="/images/avatar.svg"
+                      width={25}
+                      height={25}
+                      alt="avatar"
+                    ></Image>
+                    {username}
+                  </Link>
+                </li>
+              ) : null}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text--normal py-1 px-4 bg-red-400 text-white rounded-lg"
+                >
+                  Logout
+                </button>
+              </li>
+              </ul>
+            </nav>
+          )}
         </div>
       </header>
       <main className="main">
@@ -231,35 +297,7 @@ const ProfilePage = ({ params }: ProfilePageProps) => {
           </div>
         </section>
       </main>
-      <footer className="footer py-6">
-        <div className="footer__container flex flex-col gap-1 main__container">
-          <div className="flex items-center justify-between mb-9">
-            <div className="flex items-center gap-2">
-              <Image
-                width={30}
-                height={30}
-                src="/images/coffe.png"
-                alt="image"
-              />
-              <Link
-                href="buymeacoffee.com/vxdosick"
-                className="small--text"
-              >
-                Support the project: buymeacoffee.com/vxdosick
-              </Link>
-            </div>
-            <Link href="/" className="link--normal">
-              Privacy Policy
-            </Link>
-          </div>
-          <Link
-            href="/"
-            className="logo--smalltext text-center"
-          >
-            ResumeScanAi
-          </Link>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 };

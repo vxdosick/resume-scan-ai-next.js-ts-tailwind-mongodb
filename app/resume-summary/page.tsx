@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import Footer from "../components/Footer";
 
 export interface Feedback {
   rating: number;
@@ -19,6 +20,10 @@ const ResumeSummary = () => {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [saving, setSaving] = useState(false); // Состояние сохранения
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null); // Сообщение об успехе или ошибке
+  const [burgerOpen, setBurgerOpen] = useState(false);
+  const handeBurger = () => {
+    setBurgerOpen(!burgerOpen);
+  };
 
   const [username, setUsername] = useState<string | null>(null); // Для отображения ссылки на профиль
 
@@ -123,7 +128,7 @@ const ResumeSummary = () => {
     <>
       <header className="py-6">
         <div className="header__container flex justify-between items-center main__container">
-          <a href="/resume-summary" className="logo--normaltext">
+          <a href="/dashboard" className="logo--normaltext">
             ResumeScanAi
           </a>
           <nav className="header__menu">
@@ -140,7 +145,7 @@ const ResumeSummary = () => {
                     href={`/profile/${username}`}
                   >
                     <Image
-                      src="/images/avatar.svg"
+                      src="images/avatar.svg"
                       width={25}
                       height={25}
                       alt="avatar"
@@ -159,6 +164,67 @@ const ResumeSummary = () => {
               </li>
             </ul>
           </nav>
+        </div>
+        <div className="header__container--mobile flex justify-between items-center main__container">
+          <div className="flex justify-between">
+            <Link href="/dashboard" className="logo--normaltext">
+              ResumeScanAi
+            </Link>
+            <button
+              className="header__burger inline-block align-end font-bold 
+            text-blue-300 text-[25px]"
+              onClick={handeBurger}
+            >
+              &#9776;
+            </button>
+          </div>
+          {burgerOpen && (
+            <nav className="header__menu">
+              <ul
+                className="flex flex-col items-center gap-8 fixed z-10 top-[70px] 
+            right-[15px]
+             border border-blue-300 bg-white pb-7 px-6 pt-8"
+              >
+                <li className="absolute top-[8px] right-[8px]">
+                  <button
+                    onClick={handeBurger}
+                    className="border border-blue-300 px-2 py-1 rounded-md"
+                  >
+                    &#10005;
+                  </button>
+                </li>
+                <li>
+                <Link className="text--normal" href="/dashboard">
+                  Home
+                </Link>
+              </li>
+              {username ? (
+                <li>
+                  <Link
+                    className="text--normal flex items-center gap-2"
+                    href={`/profile/${username}`}
+                  >
+                    <Image
+                      src="images/avatar.svg"
+                      width={25}
+                      height={25}
+                      alt="avatar"
+                    ></Image>
+                    {username}
+                  </Link>
+                </li>
+              ) : null}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text--normal py-1 px-4 bg-red-400 text-white rounded-lg"
+                >
+                  Logout
+                </button>
+              </li>
+              </ul>
+            </nav>
+          )}
         </div>
       </header>
       <main className="main">
@@ -227,21 +293,7 @@ const ResumeSummary = () => {
           </div>
         </section>
       </main>
-      <footer className="footer py-6">
-        <div className="footer__container flex flex-col gap-1 main__container">
-          <div className="flex items-center justify-between mb-9">
-            <div className="flex items-center gap-2">
-              <Image width={30} height={30} src="/images/coffe.png" alt="image" />
-              <Link href="buymeacoffee.com/vxdosick" className="small--text">
-                Support the project: buymeacoffee.com/vxdosick
-              </Link>
-            </div>
-            <Link href="/" className="link--normal">Privacy Policy</Link>
-          </div>
-          <Link href="/resume-summary" className="logo--smalltext 
-          text-center">ResumeScanAi</Link>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 };

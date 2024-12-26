@@ -41,3 +41,75 @@
     font-size: 18px;
     font-weight: 400;
 }
+.header__container--mobile {
+    display: none;
+}
+.footer__container {
+    padding-top: 20px;
+    border-top: 1px solid rgba(181, 181, 181, 0.609);
+}
+
+
+@media(max-width: 970px) {
+    .scan__questions {
+        display: flex;
+        flex-direction: column;
+    }
+}
+@media(max-width: 800px) {
+    .header__container {
+        display: none;
+    }
+    .header__container--mobile {
+        display: block;
+    }
+}
+@media(max-width: 760px) {
+    .footer__links {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 50px;
+    }
+    .about__list {
+        justify-content: center;
+    }
+}
+@media(max-width: 600px) {
+    .scan__file {
+        width: 100%;
+    }
+}
+@media(max-width: 370px) {
+    .scan__questions {
+        display: flex;
+        flex-direction: column;
+    }
+    .footer__links {
+        flex-direction: column;
+    }
+    .logo--smalltext {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .logo--normaltext {
+        font-size: 24px;
+        font-weight: 600;
+    }
+    .title--text {
+        font-size: 25px;
+        font-weight: 700;
+    }
+    .subtitle--text {
+        font-size: 18px;
+        font-weight: 700;
+    }
+    .text--normal {
+        font-size: 18px;
+        font-weight: 500;
+    }
+    .small--text {
+        font-size: 15px;
+        font-weight: 400;
+    }
+}
